@@ -2029,7 +2029,6 @@ async function loadSystemSettings() {
   try {
     const me = await api("/api/v1/me");
     if (me.username && $("pw-user")) $("pw-user").value = me.username;
-    renderLicenseStatus(me.license || null);
   } catch {
     /* ignore */
   }
@@ -2157,36 +2156,6 @@ $("backup-list")?.addEventListener("click", async (ev) => {
   }
 });
 
-function renderLicenseStatus(lic) {
-  const line = $("lic-status-line");
-  const pills = $("lic-status-pills");
-  if (!line || !pills) return;
-  if (!lic) {
-    line.textContent = "无法读取授权信息";
-    pills.innerHTML = "";
-    return;
-  }
-  if (!lic.enforce) {
-    line.textContent = "当前服务器未开启授权校验（演示 / 自用模式）";
-    pills.innerHTML = `<span class="meta-pill">授权校验 关闭</span>`;
-    return;
-  }
-  const ok = !!lic.ok;
-  line.textContent = ok
-    ? "授权有效，站点可正常使用"
-    : `授权异常：${lic.reason || "未知原因"}`;
-  const expTxt =
-    lic.exp === 0 || lic.exp == null
-      ? "永久"
-      : Number(lic.exp) > 0
-        ? fmtBeijing(lic.exp)
-        : "-";
-  pills.innerHTML = [
-    `<span class="meta-pill">当前域名 ${escapeHtml(lic.host || "-")}</span>`,
-    `<span class="meta-pill">授权域名 ${escapeHtml(lic.domain || "-")}</span>`,
-    `<span class="meta-pill">到期 ${escapeHtml(expTxt)}</span>`,
-  ].join("");
-}
 $("logout").onclick = async () => {
   await api("/api/v1/logout", { method: "POST", body: "{}" });
   showGate();
