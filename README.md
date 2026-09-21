@@ -6,7 +6,7 @@
 
 没有云服务器时，可用本机 / 局域网版：[JustinaHodges/ea-monitor-local](https://github.com/JustinaHodges/ea-monitor-local)
 
-局域网的内网版的带控制开发中,功能 群控 开控EA 平仓 停止EA,切换EA,这个版本看心情开源。
+工作室局域网的内网版的带控制开发中,功能 群控 开控EA 平仓 停止EA,切换EA,这个版本看心情开源。
 
 任何人都可以克隆本仓库，自己部署一套，本项目开源，可自由使用、修改与部署。和 [https://688118.xyz/](https://688118.xyz/) 同类站点。
 
