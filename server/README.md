@@ -24,20 +24,9 @@ Open `http://localhost:8787`. Log in with your `ADMIN_TOKEN`.
 | `NOTIFY_WEBHOOK` | — | Default webhook URL (overridable in UI) |
 | `OFFLINE_AFTER_SECONDS` | `180` | Offline detection threshold |
 | `DATA_DIR` | `./data` | Directory for `ea-monitor.db` |
-| `LICENSE_ENFORCE` | `0` | `1` = require domain license |
-| `LICENSE_SECRET` | — | HMAC secret for license issue/verify |
+| `LICENSE_ENFORCE` | `0` | Keep `0` for open-source self-host (no activation code) |
 
-### License (commercial)
-
-```bash
-# Issue a key (seller machine; same LICENSE_SECRET as customer .env)
-set LICENSE_SECRET=your-long-secret
-node scripts/gen_license.mjs --domain=customer.com --days=365
-```
-
-Customer opens the site → activate key → login with `ADMIN_TOKEN`.  
-See `../docs/宝塔安装与授权.md`.
-
+See `../docs/宝塔安装.md` for BT Panel + Nginx steps.
 ## Deploy on Linux (systemd + nginx)
 
 1. Clone/copy the repo to the VPS (needs `public/`, `src/`, `schema.sql`, and `server/`).
