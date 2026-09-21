@@ -1,5 +1,7 @@
 # 四季常春监控公益版
 
+**赞助 Solana：** `JCZp9REG5AGhsr4NpkchzNdRvUwxJWNH4dhTzuGNX9xh`
+
 开源的 MT4/MT5 EA 监控网站：登录后台、看持仓与盈亏日历、生成分享页、接收 EA 上报。
 
 任何人都可以克隆本仓库，自己部署一套，和 [https://688118.xyz/](https://688118.xyz/) 同类站点。
@@ -13,7 +15,7 @@
 | `public/` | 网站页面（登录 / 看板 / 分享） |
 | `src/` | API 与业务逻辑 |
 | `server/` | Node.js + SQLite 服务端（推荐自建） |
-| `mql/` | MT4/MT5 监控 EA |
+| `mql/` | MT4/MT5 EA 监控 |
 | `schema.sql` | 数据库表结构 |
 | `deploy/` | systemd / Nginx 示例 |
 | `docs/` | 安装说明、站点功能说明与截图 |
@@ -41,12 +43,6 @@ npm start
 - 默认 `LICENSE_ENFORCE=0`，授权系统关闭，所有人可直接使用
 - 数据存在服务器本地 SQLite（`server/data/`），请自行备份
 - 请尽快修改默认管理员密码，不要把 `.env` 提交到公开仓库
-
-## 赞助
-
-如果这个开源项目帮到你，可以用 Solana 赞助：
-
-`JCZp9REG5AGhsr4NpkchzNdRvUwxJWNH4dhTzuGNX9xh`
 
 ## License
 
