@@ -113,7 +113,7 @@ export function formatAlertMessage(opts: {
   const brokerLine = [broker, server].filter(Boolean).join(" / ");
 
   const lines = [
-    `【四季常春监控】${title}`,
+    `【四季常春监控公益版】${title}`,
     `分组：${group}`,
     `实例ID：${dash(ctx.terminal_id, "-")}`,
     `备注名：${remark}`,

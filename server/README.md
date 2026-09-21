@@ -1,4 +1,4 @@
-# EA Monitor — Node.js server (VPS)
+# 四季常春监控公益版 — Node.js server (VPS)
 
 Production server for Linux VPS. Reuses the same API and business logic as the Cloudflare Worker in `../src/`, with SQLite via `better-sqlite3` instead of D1.
 

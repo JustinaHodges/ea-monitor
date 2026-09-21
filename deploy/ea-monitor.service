@@ -1,5 +1,5 @@
 [Unit]
-Description=EA Monitor Node.js server
+Description=四季常春监控公益版 Node.js server
 After=network.target
 
 [Service]

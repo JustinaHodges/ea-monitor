@@ -1,6 +1,6 @@
-#property copyright "四季常春监控"
+#property copyright "四季常春监控公益版"
 #property version   "1.00"
-#property description "四季常春监控上报模块：心跳/成交上报到 Cloudflare，不交易。"
+#property description "四季常春监控公益版上报模块：心跳/成交上报到 Cloudflare，不交易。"
 #property strict
 
 #include "EAMonitorHttp.mqh"

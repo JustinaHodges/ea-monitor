@@ -42,7 +42,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`EA Monitor server listening on http://${HOST}:${PORT}`);
+  console.log(`四季常春监控公益版 listening on http://${HOST}:${PORT}`);
   console.log(`Static UI: ../public  |  SQLite: ${process.env.DATA_DIR || "./data"}/ea-monitor.db`);
   if (!env.ADMIN_TOKEN) console.warn("WARN: ADMIN_TOKEN is not set — admin login will fail.");
 });
