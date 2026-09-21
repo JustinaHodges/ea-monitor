@@ -1,6 +1,6 @@
 # 四季常春监控公益版
 
-**赞助 Solana：** `JCZp9REG5AGhsr4NpkchzNdRvUwxJWNH4dhTzuGNX9xh`
+**如果对你有用赞助 Solana：** `JCZp9REG5AGhsr4NpkchzNdRvUwxJWNH4dhTzuGNX9xh`
 
 开源的 MT4/MT5 EA 监控网站：登录后台、看持仓与盈亏日历、生成分享页、接收 EA 上报。
 
