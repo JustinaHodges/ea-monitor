@@ -2035,6 +2035,18 @@ async function loadSystemSettings() {
   loadBackupList().catch(() => {});
 }
 
+$("ad-copy-solana")?.addEventListener("click", async () => {
+  const addr = $("ad-copy-solana")?.dataset?.addr || "";
+  const msg = $("ad-copy-msg");
+  if (!addr) return;
+  try {
+    await navigator.clipboard.writeText(addr);
+    if (msg) msg.textContent = "已复制";
+  } catch {
+    if (msg) msg.textContent = "复制失败，请手动选中地址";
+  }
+});
+
 function fmtBytes(n) {
   const x = Number(n) || 0;
   if (x < 1024) return `${x} B`;
