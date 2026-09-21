@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0b0f" />
+  <meta name="referrer" content="no-referrer" />
+  <title>四季常春监控</title>
+  <link rel="stylesheet" href="/styles.css?v=20260920calNoBar1" />
+</head>
+<body>
+  <div class="page-bg" aria-hidden="true">
+    <div class="page-bg-image"></div>
+    <video class="page-bg-video hidden" muted loop playsinline webkit-playsinline preload="auto"></video>
+    <div class="page-gradient page-gradient-a"></div>
+    <div class="page-gradient page-gradient-b"></div>
+  </div>
+
+  <div id="license-gate" class="gate hidden">
+    <div class="gate-backdrop"></div>
+    <form id="license-form" class="gate-modal glass-card" autocomplete="off">
+      <div class="brand-mark"><img src="/assets/logo.webp" alt="" width="42" height="42" /></div>
+      <h1>授权激活</h1>
+      <p class="muted">本站需授权后才能使用。安装包已绑定固定域名，且须粘贴卖家授权码激活。</p>
+      <p class="muted" id="license-host"></p>
+      <label>授权码</label>
+      <textarea id="license-key" rows="4" placeholder="粘贴完整授权码" style="width:100%;resize:vertical"></textarea>
+      <button type="submit" class="btn btn-primary">激活授权</button>
+      <div id="license-error" class="error"></div>
+    </form>
+  </div>
+
+  <div id="gate" class="gate">
+    <div class="gate-backdrop"></div>
+    <form id="login-form" class="gate-modal glass-card" autocomplete="off">
+      <div class="brand-mark"><img src="/assets/logo.webp" alt="" width="42" height="42" /></div>
+      <h1>四季常春监控</h1>
+      <p class="muted">此站点已加密。输入管理员账号和密码后才能进入。</p>
+      <label>管理员账号</label>
+      <input id="login-user" type="text" autocomplete="username" placeholder="默认 admin" autofocus />
+      <label>密码</label>
+      <input id="login-token" type="password" autocomplete="current-password" placeholder="请输入密码" />
+      <button type="submit" class="btn btn-primary">解锁进入</button>
+      <div id="login-error" class="error"></div>
+    </form>
+  </div>
+
+  <div id="app" class="hidden">
+    <header class="site-header-wrap">
+      <div class="site-header glass-shell">
+        <a class="site-brand" href="#" id="brand-home">
+          <div class="brand-mark"><img src="/assets/logo.webp" alt="" width="42" height="42" /></div>
+          <div class="brand-text">
+            <strong>四季常春监控</strong>
+            <small>摸摸小黄鱼 · mt5.16881488.xyz · 监控开发QQ:3271663089</small>
+          </div>
+        </a>
+        <nav class="site-nav">
+          <button type="button" class="nav-link is-active" data-view="home">总览</button>
+          <button type="button" class="nav-link" data-view="instances">实例管理</button>
+          <button type="button" class="nav-link" data-view="pnl">收益统计</button>
+          <button type="button" class="nav-link" data-view="trades">成交记录</button>
+          <button type="button" class="nav-link" data-view="alerts">告警</button>
+          <button type="button" class="nav-link" data-view="notify">报警设置</button>
+          <button type="button" class="nav-link" data-view="bg">背景图设置</button>
+          <button type="button" class="nav-link" data-view="system">系统设置</button>
+        </nav>
+        <div class="header-actions">
+          <div class="sound-controls">
+            <button id="sound-toggle" class="icon-btn sound-btn" type="button" title="警报声：开" aria-label="警报声开关">
+              <span class="sound-icon" aria-hidden="true">🔊</span>
+            </button>
+            <input id="sound-volume" class="sound-volume" type="range" min="0" max="100" value="70" step="1" title="警报音量" aria-label="警报音量" />
+          </div>
+          <button id="theme-toggle" class="icon-btn" type="button" title="切换亮暗">◐</button>
+          <button id="logout" class="btn btn-secondary" type="button">退出</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="site-frame">
+      <section id="view-home" class="view stack">
+        <div class="cards" id="stat-cards"></div>
+        <div class="section-head compact inst-head-bar">
+          <div id="home-group-filters" class="chip-row filter-chips"></div>
+        </div>
+        <div id="home-instances" class="inst-grid"></div>
+      </section>
+
+      <section id="view-instances" class="view hidden">
+        <div class="content-grid instances-grid">
+          <aside class="side-column">
+            <section class="glass-card sidebar-card">
+              <div class="section-head compact">
+                <h2>实例列表</h2>
+                <span>分组管理</span>
+              </div>
+              <div class="side-actions">
+                <button id="btn-create-instance" class="btn btn-primary">＋ 创建实例</button>
+                <button id="btn-create-group" class="btn btn-secondary">新建分组</button>
+              </div>
+              <div id="group-nav" class="group-nav"></div>
+            </section>
+          </aside>
+          <div class="main-column">
+            <article id="instance-empty" class="glass-card empty-state">
+              <h2>选择或创建实例</h2>
+              <p>在左侧创建实例后会弹出私钥，填进 EA 即可对接。点列表里的实例可查看详情与设置。</p>
+            </article>
+            <article id="view-instance" class="glass-card panel hidden">
+              <div class="inst-head">
+                <div>
+                  <h2 id="inst-title">实例</h2>
+                  <div id="inst-meta" class="meta meta-row"></div>
+                </div>
+                <div class="toolbar">
+                  <button id="inst-share" class="btn btn-secondary">分享</button>
+                  <button id="inst-rotate" class="btn btn-secondary">轮换私钥</button>
+                  <button id="inst-del" class="btn btn-secondary danger">删除</button>
+                </div>
+              </div>
+              <div id="inst-share-panel" class="share-panel glass-card hidden">
+                <div class="section-head compact">
+                  <h2>分享报表</h2>
+                  <span>生成链接后，对方无需登录即可查看本实例近一个月报表</span>
+                </div>
+                <div class="share-create-row">
+                  <label>有效时长（小时）
+                    <input id="share-hours" type="number" min="1" max="2160" step="1" value="24" />
+                  </label>
+                  <label>刷新间隔（秒）
+                    <input id="share-refresh-sec" type="number" min="5" max="600" step="1" value="30" />
+                  </label>
+                  <label class="check-row share-opt">
+                    <input id="share-opt-calendar" type="checkbox" checked />
+                    允许点开当日成交
+                  </label>
+                  <label class="check-row share-opt">
+                    <input id="share-opt-books" type="checkbox" checked />
+                    显示挂单数据
+                  </label>
+                  <button type="button" id="share-create" class="btn btn-primary">生成新链接</button>
+                  <span id="share-msg" class="muted"></span>
+                </div>
+                <div id="share-list" class="share-list"></div>
+              </div>
+              <div class="inst-edit-grid">
+                <label>分组
+                  <select id="inst-group"></select>
+                </label>
+                <label>实例 ID
+                  <input id="inst-id" placeholder="填进 EA 的 InpTerminalId" />
+                </label>
+                <label>备注名
+                  <input id="inst-name" placeholder="显示名称，可随时改" />
+                </label>
+                <label>浮盈告警（≥ %）
+                  <input id="inst-float-profit" type="number" min="0" max="999" step="0.1" placeholder="0=关闭，如 1" />
+                </label>
+                <label>浮亏告警（达到 %）
+                  <input id="inst-float-loss" type="number" min="0" max="999" step="0.1" placeholder="0=关闭，如 2" />
+                </label>
+                <label>金额单位
+                  <input id="inst-display-unit" maxlength="12" placeholder="如 USD / USC / 美金 / 美分" />
+                </label>
+                <label class="inst-share-intro-label">分享介绍
+                  <textarea id="inst-share-intro" rows="4" maxlength="2000" placeholder="独立介绍模块，显示在分享页持仓/挂单上方；留空则不显示"></textarea>
+                </label>
+                <label>分享联系方式
+                  <input id="inst-share-contact" maxlength="120" placeholder="如 QQ号 / TG:@username / 微信号 / 手机号 / https链接；显示在介绍旁可点联系" />
+                </label>
+                <div class="inst-edit-actions">
+                  <button id="inst-save" class="btn btn-primary">保存设置</button>
+                  <span class="muted">浮盈/浮亏按余额百分比（余额无效时用净值）；填 2 表示 ±2%。金额单位显示在卡片数字后。分享介绍与联系方式会出现在分享链接里。改 ID 后请同步改 EA 参数。</span>
+                </div>
+              </div>
+              <div class="cards" id="inst-cards"></div>
+              <section id="inst-books" class="glass-card share-books inst-books" aria-label="持仓与挂单">
+                <div class="share-books-head">
+                  <h2>持仓 / 挂单</h2>
+                  <span id="inst-books-count" class="muted"></span>
+                </div>
+                <div class="share-books-block">
+                  <h3>当前持仓 <span id="inst-pos-count" class="muted"></span></h3>
+                  <div id="inst-pos" class="table-wrap share-books-table"></div>
+                </div>
+                <div class="share-books-block">
+                  <h3>当前挂单 <span id="inst-pending-count" class="muted"></span></h3>
+                  <div id="inst-pending" class="table-wrap share-books-table"></div>
+                </div>
+              </section>
+              <div class="cal-toolbar">
+                <button type="button" class="btn btn-secondary cal-nav" data-cal="inst" data-dir="-1">上一月</button>
+                <select id="inst-cal-month"></select>
+                <button type="button" class="btn btn-secondary cal-nav" data-cal="inst" data-dir="1">下一月</button>
+                <span id="inst-cal-sum" class="meta-pill"></span>
+              </div>
+              <div class="pnl-calendar-scroller">
+                <div id="inst-calendar" class="pnl-calendar"></div>
+              </div>
+              <div id="inst-day-panel" class="glass-card day-trades-panel hidden">
+                <div class="section-head compact">
+                  <h2 id="inst-day-title">当日成交</h2>
+                  <span id="inst-day-meta" class="muted"></span>
+                </div>
+                <div id="inst-day-table" class="table-wrap day-trades-table"></div>
+              </div>
+              <p class="muted" id="inst-hint">EA 参数填：InpTerminalId、InpApiSecret；并设置 Magic、上报间隔、是否上传历史/日志。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-pnl" class="view stack hidden">
+        <article class="glass-card panel">
+          <div class="toolbar">
+            <select id="pnl-scope"><option value="">全部实例</option></select>
+            <button id="pnl-refresh" class="btn btn-secondary">刷新</button>
+          </div>
+          <div class="cards" id="pnl-cards"></div>
+          <div class="cal-toolbar">
+            <button type="button" class="btn btn-secondary cal-nav" data-cal="pnl" data-dir="-1">上一月</button>
+            <select id="pnl-cal-month"></select>
+            <button type="button" class="btn btn-secondary cal-nav" data-cal="pnl" data-dir="1">下一月</button>
+            <span id="pnl-cal-sum" class="meta-pill"></span>
+          </div>
+          <div class="pnl-calendar-scroller">
+            <div id="pnl-calendar" class="pnl-calendar"></div>
+          </div>
+          <div id="pnl-day-panel" class="glass-card day-trades-panel hidden">
+            <div class="section-head compact">
+              <h2 id="pnl-day-title">当日成交</h2>
+              <span id="pnl-day-meta" class="muted"></span>
+            </div>
+            <div id="pnl-day-table" class="table-wrap day-trades-table"></div>
+          </div>
+          <div class="section-head compact" style="margin-top:16px"><h2>按月汇总</h2></div>
+          <div id="pnl-monthly" class="table-wrap"></div>
+        </article>
+      </section>
+
+      <section id="view-trades" class="view stack hidden">
+        <article class="glass-card panel">
+          <div class="section-head compact">
+            <h2>成交记录</h2>
+            <span>下拉选分组 → 再下拉选实例 → 显示该实例成交</span>
+          </div>
+          <div class="trade-filter-grid">
+            <label class="trade-filter-field">
+              <span>① 选择分组</span>
+              <select id="t-group" data-native="1">
+                <option value="">请选择分组</option>
+              </select>
+            </label>
+            <label class="trade-filter-field">
+              <span>② 选择实例</span>
+              <select id="t-terminal" data-native="1" disabled>
+                <option value="">请先选择分组</option>
+              </select>
+            </label>
+            <label class="trade-filter-field">
+              <span>品种（可选）</span>
+              <input id="t-symbol" placeholder="如 XAUUSD" />
+            </label>
+            <label class="trade-filter-field">
+              <span>Magic（可选）</span>
+              <input id="t-magic" placeholder="Magic" />
+            </label>
+          </div>
+          <div class="toolbar" style="margin-top:12px">
+            <button id="t-search" class="btn btn-primary">查询</button>
+            <button id="t-export" class="btn btn-secondary">导出 CSV</button>
+          </div>
+          <div id="trades-table" class="table-wrap"></div>
+        </article>
+      </section>
+
+      <section id="view-alerts" class="view stack hidden">
+        <article class="glass-card panel">
+          <div class="section-head compact">
+            <h2>告警记录</h2>
+            <span>超时 / 浮盈浮亏 / 错误回报</span>
+          </div>
+          <div class="toolbar">
+            <button id="ack-all" class="btn btn-secondary">全部已读</button>
+            <button id="clear-read-alerts" class="btn btn-secondary">清理已读</button>
+          </div>
+          <div id="alerts-table" class="table-wrap"></div>
+        </article>
+      </section>
+
+      <section id="view-notify" class="view stack hidden">
+        <article class="glass-card panel">
+          <div class="section-head compact">
+            <h2>报警设置</h2>
+            <span>哪些情况报警 · 怎么通知你</span>
+          </div>
+          <form id="notify-form" class="notify-form">
+            <div class="notify-block">
+              <h3>报警开关</h3>
+              <label class="check-row"><input type="checkbox" name="alert_timeout" /> 终端超时未上报</label>
+              <label class="check-row"><input type="checkbox" name="alert_ea_timeout" /> EA 超时未心跳</label>
+              <label class="check-row"><input type="checkbox" name="alert_ea_error" /> EA 上报错误信息</label>
+              <label class="check-row"><input type="checkbox" name="alert_log_error" /> 日志错误 / fatal</label>
+              <label class="check-row"><input type="checkbox" name="alert_float_profit" /> 浮盈告警</label>
+              <label class="check-row"><input type="checkbox" name="alert_float_loss" /> 浮亏告警</label>
+              <p class="muted">浮盈/浮亏还需在各实例详情里按百分比填阈值；关掉总开关后即使设了也不会推送。</p>
+            </div>
+            <div class="notify-block">
+              <h3>通知方式</h3>
+              <p class="muted">按分组配置 Webhook：某个分组里的实例报警，只会发到该分组对应的链接。推荐企业微信 / 钉钉 / Discord / 飞书 / Bark 等。</p>
+              <label class="check-row"><input type="checkbox" name="notify_enabled" /> 启用外部通知</label>
+              <label>默认 Webhook（分组未单独填写时用这个）</label>
+              <input name="notify_webhook" type="url" placeholder="https://..." style="width:100%;max-width:640px" />
+              <div class="section-head compact" style="margin-top:14px">
+                <h3 style="margin:0;font-size:1rem">分组 Webhook</h3>
+                <span class="muted">每个分组一条，互不影响</span>
+              </div>
+              <div id="group-webhook-list" class="group-webhook-list"></div>
+              <label style="margin-top:12px">超时判定（秒）</label>
+              <input name="offline_after_seconds" type="number" min="60" step="10" style="width:160px" />
+              <p class="muted">从最后一次心跳算起，超过这个秒数就判离线并推送（默认 180）。服务器约每 60 秒检查一次，所以通常会在设置值后一分钟内提醒。</p>
+              <label style="margin-top:8px">测试发到分组</label>
+              <select id="notify-test-group" data-native="1" style="width:100%;max-width:320px"></select>
+            </div>
+            <div class="toolbar" style="margin-top:16px">
+              <button type="submit" class="btn btn-primary">保存设置</button>
+              <button type="button" id="notify-test" class="btn btn-secondary">发送测试通知</button>
+              <span id="notify-msg" class="muted"></span>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <section id="view-bg" class="view stack hidden">
+        <article class="glass-card panel">
+          <div class="section-head compact">
+            <h2>背景图设置</h2>
+            <span>白天 / 黑夜 · 电脑 / 手机，可上传图片或 mp4 动态背景</span>
+          </div>
+          <div id="bg-form" class="notify-form">
+            <div class="notify-block">
+              <p class="muted">支持 jpg / png / webp / mp4 / webm，单张最大约 150MB。mp4 会自动识别并静音循环播放（当动态背景）。</p>
+            </div>
+            <div class="notify-block">
+              <h3>白天背景</h3>
+              <div class="bg-slots">
+                <div class="bg-slot" data-slot="bg_day_desktop">
+                  <div class="bg-slot-label">电脑</div>
+                  <div class="bg-slot-thumb" id="thumb-bg_day_desktop"></div>
+                  <div class="bg-slot-actions">
+                    <button type="button" class="btn btn-primary" data-bg-pick="bg_day_desktop">上传</button>
+                    <input type="file" accept="image/*,video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov" class="bg-file-input" data-bg-upload="bg_day_desktop" />
+                    <button type="button" class="btn btn-secondary" data-bg-clear="bg_day_desktop">清除</button>
+                  </div>
+                  <input type="hidden" id="bg-day-desktop" value="" />
+                </div>
+                <div class="bg-slot" data-slot="bg_day_mobile">
+                  <div class="bg-slot-label">手机</div>
+                  <div class="bg-slot-thumb" id="thumb-bg_day_mobile"></div>
+                  <div class="bg-slot-actions">
+                    <button type="button" class="btn btn-primary" data-bg-pick="bg_day_mobile">上传</button>
+                    <input type="file" accept="image/*,video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov" class="bg-file-input" data-bg-upload="bg_day_mobile" />
+                    <button type="button" class="btn btn-secondary" data-bg-clear="bg_day_mobile">清除</button>
+                  </div>
+                  <input type="hidden" id="bg-day-mobile" value="" />
+                </div>
+              </div>
+            </div>
+            <div class="notify-block">
+              <h3>黑夜背景</h3>
+              <div class="bg-slots">
+                <div class="bg-slot" data-slot="bg_night_desktop">
+                  <div class="bg-slot-label">电脑</div>
+                  <div class="bg-slot-thumb" id="thumb-bg_night_desktop"></div>
+                  <div class="bg-slot-actions">
+                    <button type="button" class="btn btn-primary" data-bg-pick="bg_night_desktop">上传</button>
+                    <input type="file" accept="image/*,video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov" class="bg-file-input" data-bg-upload="bg_night_desktop" />
+                    <button type="button" class="btn btn-secondary" data-bg-clear="bg_night_desktop">清除</button>
+                  </div>
+                  <input type="hidden" id="bg-night-desktop" value="" />
+                </div>
+                <div class="bg-slot" data-slot="bg_night_mobile">
+                  <div class="bg-slot-label">手机</div>
+                  <div class="bg-slot-thumb" id="thumb-bg_night_mobile"></div>
+                  <div class="bg-slot-actions">
+                    <button type="button" class="btn btn-primary" data-bg-pick="bg_night_mobile">上传</button>
+                    <input type="file" accept="image/*,video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov" class="bg-file-input" data-bg-upload="bg_night_mobile" />
+                    <button type="button" class="btn btn-secondary" data-bg-clear="bg_night_mobile">清除</button>
+                  </div>
+                  <input type="hidden" id="bg-night-mobile" value="" />
+                </div>
+              </div>
+            </div>
+            <div class="notify-block">
+              <div class="toolbar" style="margin-top:12px">
+                <button type="button" id="bg-reset" class="btn btn-secondary">全部恢复默认</button>
+                <span id="bg-msg" class="muted"></span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section id="view-system" class="view stack hidden">
+        <article class="glass-card panel">
+          <div class="section-head compact">
+            <h2>系统设置</h2>
+            <span>管理员账号与登录密码</span>
+          </div>
+          <div class="notify-form">
+            <div class="notify-block">
+              <h3>授权状态</h3>
+              <p class="muted" id="lic-status-line">加载中…</p>
+              <div class="chip-row" id="lic-status-pills" style="margin-top:10px"></div>
+            </div>
+          </div>
+          <form id="password-form" class="notify-form">
+            <div class="notify-block">
+              <h3>管理员帐户</h3>
+              <p class="muted">登录需要「账号 + 密码」。默认账号为 <b>admin</b>，密码为服务器初始配置；在这里改过后以这里为准。</p>
+              <label>管理员账号</label>
+              <input id="pw-user" name="new_username" type="text" autocomplete="username" placeholder="例如 admin" style="width:100%;max-width:360px" />
+              <label>当前密码</label>
+              <input id="pw-old" name="old_password" type="password" autocomplete="current-password" style="width:100%;max-width:360px" />
+              <label>新密码（不改可留空）</label>
+              <input id="pw-new" name="new_password" type="password" autocomplete="new-password" style="width:100%;max-width:360px" />
+              <label>确认新密码</label>
+              <input id="pw-confirm" name="confirm_password" type="password" autocomplete="new-password" style="width:100%;max-width:360px" />
+              <div class="toolbar" style="margin-top:16px">
+                <button type="submit" class="btn btn-primary">保存帐户设置</button>
+                <span id="pw-msg" class="muted"></span>
+              </div>
+            </div>
+          </form>
+          <div class="notify-form" style="margin-top:8px">
+            <div class="notify-block">
+              <h3>数据备份</h3>
+              <p class="muted">备份包含全部实例、成交、快照、分享链接等数据库内容。服务器每天凌晨会自动备份；也可手动下载到电脑，换机时把文件放回 <code>server/data/ea-monitor.db</code> 后重启服务即可恢复。</p>
+              <div class="toolbar" style="margin-top:12px;gap:8px;flex-wrap:wrap">
+                <button type="button" class="btn btn-primary" id="backup-download-btn">下载最新备份</button>
+                <button type="button" class="btn" id="backup-create-btn">仅在服务器生成</button>
+                <button type="button" class="btn" id="backup-refresh-btn">刷新列表</button>
+                <span id="backup-msg" class="muted"></span>
+              </div>
+              <div id="backup-list" class="stack" style="margin-top:14px"></div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </div>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card glass-card">
+      <h3 id="modal-title">创建实例</h3>
+      <div id="modal-body"></div>
+      <div class="modal-actions" id="modal-actions"></div>
+    </div>
+  </div>
+
+  <script src="/books.js?v=20260918posDigits1"></script>
+  <script src="/app.js?v=20260920shareContact2"></script>
+</body>
+</html>

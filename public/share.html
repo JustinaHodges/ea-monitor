@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="referrer" content="no-referrer" />
+  <title>实例报表分享 · 四季常春监控</title>
+  <link rel="stylesheet" href="/styles.css?v=20260920calNoBar1" />
+</head>
+<body>
+  <div class="page-bg" aria-hidden="true">
+    <div class="page-bg-image"></div>
+    <video class="page-bg-video hidden" muted loop playsinline webkit-playsinline preload="auto"></video>
+    <div class="page-gradient"></div>
+  </div>
+
+  <main class="site-frame share-page">
+    <article class="glass-card panel">
+      <div class="glass-card share-brand-bar">
+        <div class="share-brand">
+          <div class="share-brand-left">
+            <div class="brand-mark"><img src="/assets/logo.webp" alt="" width="42" height="42" /></div>
+            <div class="brand-text">
+              <strong>四季常春监控</strong>
+              <small>分享报表 · 与站内实例月报同步</small>
+            </div>
+          </div>
+          <div class="share-brand-right">
+            <button id="theme-toggle" class="icon-btn" type="button" title="切换亮暗">◐</button>
+            <button type="button" id="share-refresh" class="btn btn-primary share-refresh-btn hidden">刷新</button>
+            <div class="share-ad">
+              摸摸小黄鱼 · <a href="https://mt5.16881488.xyz" target="_blank" rel="noopener noreferrer">mt5.16881488.xyz</a> · 监控开发QQ:3271663089
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="share-status" class="muted">加载中…</div>
+      <section id="share-intro-panel" class="glass-card share-intro-panel hidden" aria-label="介绍">
+        <div class="share-intro-head">
+          <h2>介绍</h2>
+          <a id="share-contact" class="share-contact-link hidden" href="#" rel="noopener noreferrer">
+            <span class="share-contact-lab">作者联系方式</span>
+            <span id="share-contact-val" class="share-contact-val"></span>
+          </a>
+        </div>
+        <div id="share-intro" class="share-intro"></div>
+      </section>
+      <div id="share-card-wrap" class="share-card-wrap hidden">
+        <div id="share-cards"></div>
+        <section id="share-books" class="glass-card share-books" aria-label="持仓与挂单">
+          <div class="share-books-head">
+            <h2>持仓 / 挂单</h2>
+            <span id="share-books-count" class="muted"></span>
+          </div>
+          <div class="share-books-block">
+            <h3>当前持仓 <span id="share-pos-count" class="muted"></span></h3>
+            <div id="share-pos" class="table-wrap share-books-table"></div>
+          </div>
+          <div class="share-books-block">
+            <h3>当前挂单 <span id="share-pending-count" class="muted"></span></h3>
+            <div id="share-pending" class="table-wrap share-books-table"></div>
+          </div>
+        </section>
+      </div>
+      <div id="share-cal-toolbar" class="cal-toolbar hidden">
+        <button type="button" class="btn btn-secondary" id="share-prev">上一月</button>
+        <select id="share-month"></select>
+        <button type="button" class="btn btn-secondary" id="share-next">下一月</button>
+        <span id="share-cal-sum" class="meta-pill"></span>
+      </div>
+      <div class="pnl-calendar-scroller">
+        <div id="share-calendar" class="pnl-calendar hidden"></div>
+      </div>
+      <div id="share-day-panel" class="glass-card day-trades-panel hidden">
+        <div class="section-head compact">
+          <h2 id="share-day-title">当日成交</h2>
+          <span id="share-day-meta" class="muted"></span>
+        </div>
+        <div id="share-day-table" class="table-wrap day-trades-table"></div>
+      </div>
+      <p id="share-expire" class="muted share-expire hidden"></p>
+    </article>
+  </main>
+
+  <div id="contact-modal" class="modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" data-contact-close></div>
+    <div class="modal-card glass-card contact-modal-card">
+      <h3 id="contact-modal-title">联系对方</h3>
+      <p id="contact-modal-desc" class="muted"></p>
+      <p id="contact-modal-value" class="contact-modal-value"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn" data-contact-close>取消</button>
+        <button type="button" class="btn btn-primary" id="contact-modal-open">打开应用</button>
+      </div>
+      <p id="contact-modal-hint" class="muted contact-modal-hint"></p>
+    </div>
+  </div>
+
+  <script src="/books.js?v=20260918posDigits1"></script>
+  <script src="/share.js?v=20260920shareContact4"></script>
+</body>
+</html>

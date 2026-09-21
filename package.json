@@ -1,0 +1,20 @@
+{
+  "name": "ea-monitor",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create ea-monitor",
+    "db:migrate": "wrangler d1 execute ea-monitor --remote --file=./schema.sql",
+    "db:migrate:local": "wrangler d1 execute ea-monitor --local --file=./schema.sql",
+    "db:migrate:groups": "wrangler d1 execute ea-monitor --remote --file=./schema-migrate-groups.sql",
+    "db:migrate:groups:local": "wrangler d1 execute ea-monitor --local --file=./schema-migrate-groups.sql",
+    "simulate": "node scripts/simulate-report.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260910.1",
+    "typescript": "^5.9.2",
+    "wrangler": "^4.34.0"
+  }
+}

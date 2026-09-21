@@ -1,0 +1,27 @@
+node_modules
+.wrangler
+.dev.vars
+dist
+*.toml.bak
+server/data
+server/.env
+server/.env.*
+!.env.example
+
+# Not part of the public site open-source tree
+admin/
+TypechoGlass/
+tools/
+scripts/
+packaging/
+docs/卖家打包与发卡.md
+
+# User uploads / clutter
+public/uploads/**
+!public/uploads/.gitkeep
+*.log
+.DS_Store
+Thumbs.db
+
+packaging/
+

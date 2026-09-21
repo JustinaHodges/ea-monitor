@@ -1,0 +1,17 @@
+[Unit]
+Description=EA Monitor Node.js server
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/ea-monitor/server
+EnvironmentFile=/opt/ea-monitor/server/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node --import tsx index.ts
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
