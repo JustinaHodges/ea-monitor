@@ -6,8 +6,6 @@
 
 任何人都可以克隆本仓库，自己部署一套，和 [https://688118.xyz/](https://688118.xyz/) 同类站点。
 
-**不需要授权码、不需要向任何人购买激活。**
-
 ## 仓库里有什么
 
 | 目录 | 作用 |
@@ -28,7 +26,7 @@
 git clone https://github.com/JustinaHodges/ea-monitor.git
 cd ea-monitor/server
 cp .env.example .env
-# 编辑 .env：把 ADMIN_TOKEN 改成你的密码，保持 LICENSE_ENFORCE=0
+# 编辑 .env：把 ADMIN_TOKEN 改成你的密码
 
 npm install
 npm start
@@ -40,7 +38,6 @@ npm start
 
 ## 说明
 
-- 默认 `LICENSE_ENFORCE=0`，授权系统关闭，所有人可直接使用
 - 数据存在服务器本地 SQLite（`server/data/`），请自行备份
 - 请尽快修改默认管理员密码，不要把 `.env` 提交到公开仓库
 

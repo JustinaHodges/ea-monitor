@@ -24,7 +24,6 @@ Open `http://localhost:8787`. Log in with your `ADMIN_TOKEN`.
 | `NOTIFY_WEBHOOK` | — | Default webhook URL (overridable in UI) |
 | `OFFLINE_AFTER_SECONDS` | `180` | Offline detection threshold |
 | `DATA_DIR` | `./data` | Directory for `ea-monitor.db` |
-| `LICENSE_ENFORCE` | `0` | Keep `0` for open-source self-host (no activation code) |
 
 See `../docs/宝塔安装.md` for BT Panel + Nginx steps.
 ## Deploy on Linux (systemd + nginx)
