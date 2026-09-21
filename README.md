@@ -42,6 +42,12 @@ npm start
 - 数据存在服务器本地 SQLite（`server/data/`），请自行备份
 - 请尽快修改默认管理员密码，不要把 `.env` 提交到公开仓库
 
+## 赞助
+
+如果这个开源项目帮到你，可以用 Solana 赞助：
+
+`JCZp9REG5AGhsr4NpkchzNdRvUwxJWNH4dhTzuGNX9xh`
+
 ## License
 
 本项目开源，可自由使用、修改与部署。
