@@ -16,7 +16,9 @@
 | `mql/` | MT4/MT5 监控 EA |
 | `schema.sql` | 数据库表结构 |
 | `deploy/` | systemd / Nginx 示例 |
-| `docs/` | 安装说明 |
+| `docs/` | 安装说明、站点功能说明与截图 |
+
+界面与功能介绍见：[docs/站点功能说明.md](docs/站点功能说明.md)
 
 ## 最快部署
 
