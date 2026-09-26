@@ -12,7 +12,7 @@
 
 个人博客：[摸摸小黄鱼](https://mt5.16881488.xyz/)
 
-QQ:3271663089 t.me/ton66888
+不会安装联系 我请我抽包烟就行 QQ:3271663089 t.me/ton66888
 
 分享2个不错的EA: https://688118.xyz/s/nWYc3VxE
                 https://688118.xyz/s/hnZC2XBo
