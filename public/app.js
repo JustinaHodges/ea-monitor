@@ -1803,6 +1803,7 @@ async function boot() {
     showApp();
     await loadWorkspace();
     await loadHome();
+    maybeShowPromoAd().catch(() => {});
   } catch (e) {
     if (e.code === 402) {
       showLicenseGate(e.data?.license || { reason: e.message });
@@ -1849,6 +1850,7 @@ $("login-form").onsubmit = async (e) => {
     showApp();
     await loadWorkspace();
     await loadHome();
+    maybeShowPromoAd().catch(() => {});
   } catch (err) {
     if (err.code === 402) {
       showLicenseGate(err.data?.license || { reason: err.message });
@@ -2580,6 +2582,53 @@ window.matchMedia(BG_MOBILE_MQ).addEventListener("change", () => {
 $("modal").onclick = (ev) => {
   if (ev.target.matches("[data-close], .modal-backdrop")) closeModal();
 };
+
+function closePromoModal() {
+  $("promo-modal")?.classList.add("hidden");
+  window.__ea_promo_current = null;
+}
+
+function openPromoModal(ad) {
+  if (!ad || !ad.enabled) return;
+  if (!ad.title && !ad.body && !ad.image_url) return;
+  window.__ea_promo_current = ad;
+  $("promo-modal-title").textContent = ad.title || "公告";
+  const parts = [];
+  if (ad.image_url) {
+    parts.push(`<img class="promo-modal-img" src="${escapeHtml(ad.image_url)}" alt="" />`);
+  }
+  if (ad.body) {
+    parts.push(`<p class="promo-modal-text">${escapeHtml(ad.body).replace(/\n/g, "<br>")}</p>`);
+  }
+  $("promo-modal-body").innerHTML = parts.join("") || `<p class="muted">暂无内容</p>`;
+  const linkBtn = $("promo-modal-link");
+  if (ad.link_url) {
+    linkBtn.href = ad.link_url;
+    linkBtn.textContent = ad.link_text || "了解更多";
+    linkBtn.classList.remove("hidden");
+  } else {
+    linkBtn.classList.add("hidden");
+    linkBtn.removeAttribute("href");
+  }
+  $("promo-modal").classList.remove("hidden");
+}
+
+/** 每次进入后台必弹（主站下发；点「知道了」才关，点遮罩关不了） */
+async function maybeShowPromoAd() {
+  try {
+    const ad = await api("/api/v1/promo-ad");
+    if (!ad.enabled) return;
+    if (!ad.title && !ad.body && !ad.image_url) return;
+    openPromoModal(ad);
+  } catch {
+    /* ignore */
+  }
+}
+
+document.querySelectorAll("#promo-modal [data-promo-close]").forEach((el) => {
+  if (el.classList.contains("modal-backdrop")) return;
+  el.addEventListener("click", () => closePromoModal());
+});
 
 boot();
 loadAndApplyBackground();

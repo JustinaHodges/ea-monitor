@@ -37,6 +37,7 @@ import {
   stopShare,
 } from "./share";
 import { clampInt, ensureTerminalAlertColumns, finiteNumber, likeEscape } from "./sqlSafe";
+import { promoAdPublicJson, resolvePromoAd } from "./adPromo";
 
 function q(url: URL, key: string): string {
   return url.searchParams.get(key) || "";
@@ -92,7 +93,8 @@ export async function handleAdminApi(request: Request, env: Env): Promise<Respon
     // ui-settings GET / bg-proxy 仍允许（登录页背景）；其余拦截
     const allowWithoutLicense =
       (path === "/api/v1/ui-settings" && request.method === "GET") ||
-      (path === "/api/v1/bg-proxy" && request.method === "GET");
+      (path === "/api/v1/bg-proxy" && request.method === "GET") ||
+      (path === "/api/v1/promo-ad" && request.method === "GET");
     if (!allowWithoutLicense) return licenseBlock;
   }
 
@@ -110,6 +112,11 @@ export async function handleAdminApi(request: Request, env: Env): Promise<Respon
   // 外观设置可读（登录页也要换背景）
   if (path === "/api/v1/ui-settings" && request.method === "GET") {
     return json(await getUiSettings(env));
+  }
+
+  // 广告弹窗：固定从主站拉取（公益版不可改、不可关）
+  if (path === "/api/v1/promo-ad" && request.method === "GET") {
+    return json(promoAdPublicJson(await resolvePromoAd(env)));
   }
 
   // 背景图代理：绕过壁纸站防盗链（Referer 403）

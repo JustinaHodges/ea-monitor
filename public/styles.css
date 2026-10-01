@@ -1274,6 +1274,15 @@ html:not([data-theme="dark"]) .day-trades-table th {
 .modal-card .ui-select { z-index: 2; }
 .modal-card .ui-select.is-open { z-index: 6; }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+#promo-modal { z-index: 1300; }
+.promo-modal-card { width: min(520px, 94vw); }
+.promo-modal-body { margin-top: 8px; }
+.promo-modal-img {
+  display: block; max-width: 100%; max-height: 240px; object-fit: contain;
+  border-radius: 10px; margin-bottom: 12px;
+}
+.promo-modal-text { margin: 0; line-height: 1.55; white-space: normal; color: var(--text-2); }
+.promo-modal-actions { justify-content: flex-end; flex-wrap: wrap; }
 .confirm-msg {
   margin: 4px 0 0;
   font-size: 0.98rem;
