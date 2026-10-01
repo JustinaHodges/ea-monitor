@@ -866,8 +866,53 @@ async function loadShareData({ quiet = false } = {}) {
 }
 
 async function main() {
+  maybeShowPromoAd().catch(() => {});
   await loadBgOnce();
   await loadShareData();
+}
+
+function closePromoModal() {
+  $("promo-modal")?.classList.add("hidden");
+}
+
+function openPromoModal(ad) {
+  if (!ad || !ad.enabled) return;
+  if (!ad.title && !ad.body && !ad.image_url) return;
+  $("promo-modal-title").textContent = ad.title || "公告";
+  const parts = [];
+  if (ad.image_url) {
+    parts.push(`<img class="promo-modal-img" src="${escapeHtml(ad.image_url)}" alt="" />`);
+  }
+  if (ad.body) {
+    parts.push(`<p class="promo-modal-text">${escapeHtml(ad.body).replace(/\n/g, "<br>")}</p>`);
+  }
+  $("promo-modal-body").innerHTML = parts.join("") || `<p class="muted">暂无内容</p>`;
+  const linkBtn = $("promo-modal-link");
+  if (linkBtn) {
+    if (ad.link_url) {
+      linkBtn.href = ad.link_url;
+      linkBtn.textContent = ad.link_text || "了解更多";
+      linkBtn.classList.remove("hidden");
+    } else {
+      linkBtn.classList.add("hidden");
+      linkBtn.removeAttribute("href");
+    }
+  }
+  $("promo-modal")?.classList.remove("hidden");
+}
+
+/** 分享页每次打开必弹（主站下发；点「知道了」才关） */
+async function maybeShowPromoAd() {
+  try {
+    const res = await fetch("/api/v1/promo-ad", { credentials: "same-origin" });
+    if (!res.ok) return;
+    const ad = await res.json();
+    if (!ad.enabled) return;
+    if (!ad.title && !ad.body && !ad.image_url) return;
+    openPromoModal(ad);
+  } catch {
+    /* ignore */
+  }
 }
 
 $("share-month")?.addEventListener("change", () => {
@@ -910,4 +955,8 @@ window.matchMedia("(max-width: 768px)").addEventListener("change", () => {
 });
 
 initTheme();
+document.querySelectorAll("#promo-modal [data-promo-close]").forEach((el) => {
+  if (el.classList.contains("modal-backdrop")) return;
+  el.addEventListener("click", () => closePromoModal());
+});
 main();
