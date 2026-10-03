@@ -111,3 +111,97 @@ export function promoAdPublicJson(ad: PromoAdSettings) {
     rev: ad.rev,
   };
 }
+
+/* ========== 分享页中间广告条：固定从主站拉取 ========== */
+
+export type ShareBannerItem = {
+  title: string;
+  text: string;
+  image_url: string;
+  link_url: string;
+};
+
+export type ShareBannerSettings = {
+  enabled: boolean;
+  items: ShareBannerItem[];
+};
+
+/** 公益版固定从主站拉分享页广告条，本机不可编辑、不可关闭 */
+export const SHARE_BANNER_SOURCE = "https://www.688118.xyz/api/v1/share-banner";
+
+const BANNER_DEFAULTS: ShareBannerSettings = {
+  enabled: false,
+  items: [],
+};
+
+function normalizeBannerItem(raw: Partial<ShareBannerItem> | null | undefined): ShareBannerItem {
+  const src = raw && typeof raw === "object" ? raw : {};
+  return {
+    title: clampText(src.title, 40),
+    text: clampText(src.text, 80),
+    image_url: sanitizeUrl(src.image_url, true),
+    link_url: sanitizeUrl(src.link_url, false),
+  };
+}
+
+function bannerItemHasContent(it: ShareBannerItem): boolean {
+  return !!(it.title || it.text || it.image_url || it.link_url);
+}
+
+function normalizeBanner(raw: Partial<ShareBannerSettings> | null | undefined): ShareBannerSettings {
+  const src = raw && typeof raw === "object" ? raw : {};
+  const list = Array.isArray(src.items) ? src.items : [];
+  const items = list
+    .slice(0, 4)
+    .map((x) => normalizeBannerItem(x as Partial<ShareBannerItem>))
+    .filter(bannerItemHasContent);
+  return {
+    enabled: !!src.enabled && items.length > 0,
+    items,
+  };
+}
+
+function absolutizeBanner(settings: ShareBannerSettings, origin: string): ShareBannerSettings {
+  const base = origin.replace(/\/$/, "");
+  return {
+    ...settings,
+    items: settings.items.map((it) =>
+      it.image_url.startsWith("/") ? { ...it, image_url: `${base}${it.image_url}` } : it,
+    ),
+  };
+}
+
+/**
+ * 公益版只接收分享页广告条：固定拉取主站设置。
+ * 分享页打开时走此接口，保证与 www.688118.xyz 后台配置一致。
+ */
+export async function resolveShareBanner(_env: Env): Promise<ShareBannerSettings> {
+  const source = SHARE_BANNER_SOURCE;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch(source, {
+      headers: { Accept: "application/json", "User-Agent": "ea-monitor-share-banner/1" },
+      signal: ctrl.signal,
+    }).finally(() => clearTimeout(timer));
+    if (!res.ok) return { ...BANNER_DEFAULTS, items: [] };
+    const data = (await res.json()) as Partial<ShareBannerSettings>;
+    const banner = normalizeBanner(data);
+    try {
+      return absolutizeBanner(banner, new URL(source).origin);
+    } catch {
+      return banner;
+    }
+  } catch {
+    return { ...BANNER_DEFAULTS, items: [] };
+  }
+}
+
+export function shareBannerPublicJson(s: ShareBannerSettings) {
+  const items = s.enabled ? s.items.filter(bannerItemHasContent) : [];
+  return {
+    enabled: !!s.enabled && items.length > 0,
+    items,
+  };
+}
+

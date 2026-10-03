@@ -848,9 +848,53 @@ async function loadShareData({ quiet = false } = {}) {
 async function main() {
   // 广告与报表并行：打开分享链接立刻弹主站广告（不可关源、不可改文案）
   const promoPromise = maybeShowPromoAd();
+  const bannerPromise = loadShareBanner();
   await loadBgOnce();
   await loadShareData();
-  await promoPromise;
+  await Promise.all([promoPromise, bannerPromise]);
+}
+
+function renderShareBanner(data) {
+  const panel = $("share-banner");
+  const box = $("share-banner-items");
+  if (!panel || !box) return;
+  const items = Array.isArray(data?.items)
+    ? data.items.filter((it) => it && (it.title || it.text || it.image_url || it.link_url))
+    : [];
+  if (!data?.enabled || !items.length) {
+    panel.classList.add("hidden");
+    box.innerHTML = "";
+    return;
+  }
+  box.innerHTML = items
+    .map((it) => {
+      const title = escapeHtml(it.title || "");
+      const text = escapeHtml(it.text || "");
+      const img = String(it.image_url || "").trim();
+      const href = String(it.link_url || "").trim();
+      const inner = `
+        ${img ? `<img class="share-banner-img" src="${escapeHtml(img)}" alt="" loading="lazy" />` : ""}
+        <div class="share-banner-copy">
+          ${title ? `<strong class="share-banner-title">${title}</strong>` : ""}
+          ${text ? `<span class="share-banner-text">${text}</span>` : ""}
+        </div>`;
+      if (href) {
+        return `<a class="share-banner-item" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${inner}</a>`;
+      }
+      return `<div class="share-banner-item share-banner-item-static">${inner}</div>`;
+    })
+    .join("");
+  panel.classList.remove("hidden");
+}
+
+async function loadShareBanner() {
+  try {
+    const res = await fetch("/api/v1/share-banner", { credentials: "same-origin" });
+    if (!res.ok) return;
+    renderShareBanner(await res.json());
+  } catch {
+    /* ignore */
+  }
 }
 
 function closePromoModal() {
