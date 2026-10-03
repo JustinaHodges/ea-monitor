@@ -509,36 +509,16 @@ function closeContactModal() {
 
 function launchContactApp(info) {
   if (!info) return;
-  const deep = String(info.deep || "").trim();
   const web = String(info.web || "").trim();
-  const isTel = /^tel:/i.test(deep) || /^tel:/i.test(web);
-  if (isTel) {
-    window.location.href = deep || web;
+  const deep = String(info.deep || "").trim();
+  const url = web || deep;
+  if (!url) return;
+  if (/^tel:/i.test(url)) {
+    window.location.href = url;
     return;
   }
-  const mobile = /Mobile|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
-  if (deep && mobile) {
-    const start = Date.now();
-    window.location.href = deep;
-    if (web && web !== deep) {
-      setTimeout(() => {
-        if (Date.now() - start < 1600) window.open(web, "_blank", "noopener,noreferrer");
-      }, 1100);
-    }
-    return;
-  }
-  if (deep) {
-    const iframe = document.createElement("iframe");
-    iframe.style.cssText = "display:none;width:0;height:0;border:0";
-    iframe.src = deep;
-    document.body.appendChild(iframe);
-    setTimeout(() => iframe.remove(), 2000);
-  }
-  if (web) {
-    setTimeout(() => window.open(web, "_blank", "noopener,noreferrer"), deep ? 400 : 0);
-  } else if (deep) {
-    window.location.href = deep;
-  }
+  // 一律新标签打开，避免 tg:// 等深链把当前窗口顶到后面
+  window.open(url, "_blank", "noopener,noreferrer");
 }
 
 function openContactModal(info) {
@@ -891,7 +871,16 @@ function bindSharePromoContactButton(ad) {
   btn.classList.remove("hidden");
   btn.onclick = (ev) => {
     ev.preventDefault();
-    if (info) openContactModal(info);
+    const web = String(info?.web || "").trim();
+    const deep = String(info?.deep || "").trim();
+    const url = web || deep;
+    if (!url) return;
+    if (/^tel:/i.test(url)) {
+      window.location.href = url;
+      return;
+    }
+    // 赞助弹窗里的联系：直接新开页面，避免再套一层弹窗 / 深链抢焦点
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 }
 

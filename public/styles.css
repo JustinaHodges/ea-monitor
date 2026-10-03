@@ -2208,3 +2208,27 @@ html:not([data-theme="dark"]) .inst-stats .val {
   .site-header-wrap, .site-frame { width: calc(100% - 8px); }
   .panel { padding: 12px 6px; }
 }
+
+/* 广告设置：正文等多行框只要轻微圆角，不要胶囊/椭圆 */
+#promo-admin-block input[type="text"],
+#promo-admin-block input[type="url"],
+#promo-admin-block textarea,
+#promo-body {
+  border-radius: 10px !important;
+  min-height: auto;
+}
+#promo-body {
+  min-height: 280px !important;
+  max-width: 720px;
+  width: 100%;
+  line-height: 1.55;
+  padding: 12px 14px !important;
+  font-size: 0.95rem;
+  resize: vertical;
+}
+#promo-admin-block textarea,
+#promo-admin-block input[type="text"],
+#promo-admin-block input[type="url"] {
+  max-width: 720px;
+}
+

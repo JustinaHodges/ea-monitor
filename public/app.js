@@ -2588,6 +2588,93 @@ function closePromoModal() {
   window.__ea_promo_current = null;
 }
 
+function promoContactLinkInfo(raw) {
+  const text = String(raw || "").trim();
+  if (!text) return null;
+  const tg =
+    text.match(/^(?:tg|telegram)[:：\s]*@?([A-Za-z0-9_]{4,64})$/i) ||
+    text.match(/^@([A-Za-z0-9_]{4,64})$/) ||
+    text.match(/^(?:https?:\/\/)?(?:t\.me|telegram\.me)\/([A-Za-z0-9_]+)/i);
+  if (tg && tg[1]) {
+    const user = tg[1];
+    return {
+      app: "Telegram",
+      deep: `tg://resolve?domain=${encodeURIComponent(user)}`,
+      web: `https://t.me/${encodeURIComponent(user)}`,
+    };
+  }
+  const qqLabeled = text.match(/^(?:qq|QQ)[:：\s]*(\d{5,12})$/);
+  const qqDigits = /^\d{5,12}$/.test(text) && !/^1\d{10}$/.test(text) ? text : null;
+  const uin = qqLabeled ? qqLabeled[1] : qqDigits;
+  if (uin) {
+    return {
+      app: "QQ",
+      deep: `tencent://message/?uin=${encodeURIComponent(uin)}&Site=&Menu=yes`,
+      web: `https://wpa.qq.com/msgrd?v=3&uin=${encodeURIComponent(uin)}&site=qq&menu=yes`,
+    };
+  }
+  const phone = text.replace(/[\s\-()]/g, "");
+  if (/^1\d{10}$/.test(text) || (/^\+?\d{8,15}$/.test(phone) && !/^\d{5,12}$/.test(text))) {
+    const num = /^1\d{10}$/.test(text) ? text : phone;
+    return { app: "电话", deep: `tel:${num}`, web: `tel:${num}` };
+  }
+  if (/^wx[:：\s]/i.test(text) || /^微信[:：\s]/.test(text) || /^wechat[:：\s]/i.test(text)) {
+    return { app: "微信", deep: "weixin://", web: "" };
+  }
+  if (/^(https?:\/\/|mailto:|tel:|tencent:|tg:)/i.test(text)) {
+    return { app: "链接", deep: text, web: text };
+  }
+  if (/^[a-z0-9.-]+\.[a-z]{2,}([/:].*)?$/i.test(text)) {
+    const href = text.startsWith("http") ? text : `https://${text}`;
+    return { app: "浏览器", deep: href, web: href };
+  }
+  return { app: "联系方式", deep: "", web: "", copy: text };
+}
+
+function launchPromoContact(raw) {
+  const info = promoContactLinkInfo(raw);
+  if (!info) return;
+  if (info.copy && !info.deep && !info.web) {
+    const val = String(info.copy);
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(val).then(
+        () => alert(`已复制联系方式：${val}`),
+        () => prompt("请复制联系方式", val),
+      );
+    } else {
+      prompt("请复制联系方式", val);
+    }
+    return;
+  }
+  const web = String(info.web || "").trim();
+  const deep = String(info.deep || "").trim();
+  const url = web || deep;
+  if (!url) return;
+  if (/^tel:/i.test(url)) {
+    window.location.href = url;
+    return;
+  }
+  // 与正式站一致：新标签打开，避免深链把弹窗顶到后面
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function bindPromoContactButton(ad) {
+  const btn = $("promo-modal-contact");
+  if (!btn) return;
+  const value = String(ad?.contact_value || "").trim();
+  if (!value) {
+    btn.classList.add("hidden");
+    btn.onclick = null;
+    return;
+  }
+  btn.textContent = String(ad?.contact_text || "").trim() || "联系我";
+  btn.classList.remove("hidden");
+  btn.onclick = (ev) => {
+    ev.preventDefault();
+    launchPromoContact(value);
+  };
+}
+
 function openPromoModal(ad) {
   if (!ad || !ad.enabled) return;
   if (!ad.title && !ad.body && !ad.image_url) return;
@@ -2610,6 +2697,7 @@ function openPromoModal(ad) {
     linkBtn.classList.add("hidden");
     linkBtn.removeAttribute("href");
   }
+  bindPromoContactButton(ad);
   $("promo-modal").classList.remove("hidden");
 }
 
