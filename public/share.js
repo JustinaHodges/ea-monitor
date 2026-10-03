@@ -866,13 +866,33 @@ async function loadShareData({ quiet = false } = {}) {
 }
 
 async function main() {
-  maybeShowPromoAd().catch(() => {});
+  // 广告与报表并行：打开分享链接立刻弹主站广告（不可关源、不可改文案）
+  const promoPromise = maybeShowPromoAd();
   await loadBgOnce();
   await loadShareData();
+  await promoPromise;
 }
 
 function closePromoModal() {
   $("promo-modal")?.classList.add("hidden");
+}
+
+function bindSharePromoContactButton(ad) {
+  const btn = $("promo-modal-contact");
+  if (!btn) return;
+  const value = String(ad?.contact_value || "").trim();
+  if (!value) {
+    btn.classList.add("hidden");
+    btn.onclick = null;
+    return;
+  }
+  const info = contactLinkInfo(value);
+  btn.textContent = String(ad?.contact_text || "").trim() || (info?.label ? `联系 ${info.app}` : "联系我");
+  btn.classList.remove("hidden");
+  btn.onclick = (ev) => {
+    ev.preventDefault();
+    if (info) openContactModal(info);
+  };
 }
 
 function openPromoModal(ad) {
@@ -898,10 +918,11 @@ function openPromoModal(ad) {
       linkBtn.removeAttribute("href");
     }
   }
+  bindSharePromoContactButton(ad);
   $("promo-modal")?.classList.remove("hidden");
 }
 
-/** 分享页每次打开必弹（主站下发；点「知道了」才关） */
+/** 分享页每次打开必弹主站广告（经本机 /api/v1/promo-ad 代理；无本地缓存跳过） */
 async function maybeShowPromoAd() {
   try {
     const res = await fetch("/api/v1/promo-ad", { credentials: "same-origin" });
@@ -955,8 +976,12 @@ window.matchMedia("(max-width: 768px)").addEventListener("change", () => {
 });
 
 initTheme();
-document.querySelectorAll("#promo-modal [data-promo-close]").forEach((el) => {
-  if (el.classList.contains("modal-backdrop")) return;
-  el.addEventListener("click", () => closePromoModal());
+document.addEventListener("click", (ev) => {
+  const t = ev.target;
+  if (!(t instanceof Element)) return;
+  if (t.closest("#promo-modal [data-promo-close]")) closePromoModal();
+});
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape") closePromoModal();
 });
 main();

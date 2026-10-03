@@ -7,6 +7,10 @@ export type PromoAdSettings = {
   image_url: string;
   link_url: string;
   link_text: string;
+  /** 弹窗联系按钮文字，如「联系我」 */
+  contact_text: string;
+  /** 联系方式：QQ号 / TG:@xxx / 手机 / 链接 */
+  contact_value: string;
   /** 内容版本号（主站推送用） */
   rev: number;
 };
@@ -18,6 +22,8 @@ const DEFAULTS: PromoAdSettings = {
   image_url: "",
   link_url: "",
   link_text: "",
+  contact_text: "",
+  contact_value: "",
   rev: 1,
 };
 
@@ -52,6 +58,8 @@ function normalize(raw: Partial<PromoAdSettings>): PromoAdSettings {
     image_url: sanitizeUrl(raw.image_url, true),
     link_url: sanitizeUrl(raw.link_url, false),
     link_text: clampText(raw.link_text, 80) || "了解更多",
+    contact_text: clampText(raw.contact_text, 40),
+    contact_value: clampText(raw.contact_value, 200),
     rev: Math.max(1, Number(raw.rev) || 1),
   };
 }
@@ -66,6 +74,7 @@ function absolutizeAd(ad: PromoAdSettings, origin: string): PromoAdSettings {
 
 /**
  * 公益版只接收广告：固定拉取主站文案，本机不可编辑、不可关闭。
+ * 分享页 / 登录页均走此接口，保证弹出的是 www.688118.xyz 后台设置的广告。
  */
 export async function resolvePromoAd(_env: Env): Promise<PromoAdSettings> {
   const source = PROMO_AD_SOURCE;
@@ -97,6 +106,8 @@ export function promoAdPublicJson(ad: PromoAdSettings) {
     image_url: ad.image_url,
     link_url: ad.link_url,
     link_text: ad.link_text,
+    contact_text: ad.contact_text,
+    contact_value: ad.contact_value,
     rev: ad.rev,
   };
 }
